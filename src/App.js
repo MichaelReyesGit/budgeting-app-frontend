@@ -1,25 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import axios from "axios";
+import NavBar from "./components/NavBar";
+import TransactionIndex from "./components/TransactionIndex";
+import TransactionShow from "./components/TransactionShow";
+import TransactionForm from "./components/TransactionForm";
+import TransactionEdit from "./components/TransactionEdit";
+import url from "./url";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${url}/transactions`)
+      .then((response) => {
+        setTransactions(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route
+          path="/transactions/new"
+          element={<TransactionForm setTransactions={setTransactions} />}
+        />
+        <Route
+          path="/transactions/:id/edit"
+          element={<TransactionEdit setTransactions={setTransactions} />}
+        />
+
+        <Route
+          path="/transactions/:id"
+          element={<TransactionShow transactions={transactions} />}
+        />
+
+        <Route
+          path="/"
+          element={<TransactionIndex transactions={transactions} />}
+        />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
